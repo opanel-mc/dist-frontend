@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OPanel 文件分发",
+  title: "OPanel 资源库",
   description: "在此下载OPanel的插件 / 模组文件",
   icons: LogoIcon.src
 };
@@ -27,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="zh-cn">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <main className="h-screen px-[400px] max-xl:px-[300px] max-lg:px-20 max-md:px-11 py-10">
+          {children}
+        </main>
       </body>
     </html>
   );
