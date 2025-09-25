@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Footer } from "./footer";
 import LogoIcon from "@/assets/logo.png";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <main className="h-screen px-[400px] max-xl:px-[300px] max-lg:px-20 max-md:px-11 py-10">
           {children}
+          <Footer />
         </main>
       </body>
     </html>
