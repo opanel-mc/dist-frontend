@@ -73,8 +73,8 @@ export const mockFiles: FileInfo[] = [
 // 模拟API响应
 export const mockCachedFilesResponse: CachedFilesResponse = {
   repository: "opanel-mc/opanel",
-  total_files: mockFiles.length,
-  total_size_mb: mockFiles.reduce((sum, file) => sum + file.size_mb, 0),
-  files: mockFiles,
+  total_files: [].length,
+  total_size_mb: 0,
+  files: [],
   timestamp: new Date().toISOString()
 };
