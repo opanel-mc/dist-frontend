@@ -3,7 +3,7 @@ import { mockCachedFilesResponse } from './mock-data';
 import supportedVersionList from "@/data/supported-version-list.json";
 
 // API基础配置
-const API_BASE_URL = 'https://opanel-dl.hugo.net.cn:8000';
+const API_BASE_URL = 'https://opanel-dl.hugo.net.cn';
 const DEFAULT_REPO = 'opanel-mc/opanel';
 
 // 通用API请求函数
