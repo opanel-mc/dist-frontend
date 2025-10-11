@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { Download } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Select,
   SelectContent,
@@ -16,9 +15,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import BrandIcon from "@/assets/brand-light.svg";
-import { api, filterFilesByPlatform, filterFilesByGameVersion, filterFilesByOpanelVersion, getAvailablePlatforms, getAvailableGameVersions, getAvailableOpanelVersions, getSupportedVersions } from "@/lib/api";
+import { api, filterFilesByPlatform, filterFilesByGameVersion, filterFilesByOpanelVersion, getAvailablePlatforms, getAvailableOpanelVersions, getSupportedVersions } from "@/lib/api";
 import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
+import supportedVersionList from "@/data/supported-version-list.json";
 import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
 
 export default function Home() {
@@ -26,6 +26,19 @@ export default function Home() {
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<FileInfo[]>([]);
   const [downloadSource, setDownloadSource] = useState<DownloadSource>("opanel");
+  const availableGameVersions = useMemo(() => {
+    const list: string[] = [];
+    for(const versionMap of Object.values(supportedVersionList)) {
+      for(const versions of Object.values(versionMap)) {
+        for(const version of versions) {
+          if(!list.includes(version)) {
+            list.push(version);
+          }
+        }
+      }
+    }
+    return list.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+  }, [supportedVersionList]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -38,7 +51,6 @@ export default function Home() {
 
   // 可用选项
   const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([]);
-  const [availableGameVersions, setAvailableGameVersions] = useState<string[]>([]);
   const [availableOpanelVersions, setAvailableOpanelVersions] = useState<string[]>([]);
 
   // 加载数据
@@ -54,7 +66,6 @@ export default function Home() {
         
         // 设置可用选项
         setAvailablePlatforms(getAvailablePlatforms(response.files));
-        setAvailableGameVersions(getAvailableGameVersions(response.files));
         setAvailableOpanelVersions(getAvailableOpanelVersions(response.files));
         
       } catch (err) {

@@ -184,15 +184,6 @@ export function getAvailablePlatforms(files: FileInfo[]): string[] {
   return Array.from(platforms).sort();
 }
 
-// 工具函数：获取所有可用的游戏版本
-export function getAvailableGameVersions(files: FileInfo[]): string[] {
-  const versions = new Set(files.map(file => file.mc_version));
-  return Array.from(versions).sort((a, b) => {
-    // 简单的版本排序，可以根据需要改进
-    return b.localeCompare(a, undefined, { numeric: true });
-  });
-}
-
 // 工具函数：获取所有可用的OPanel版本
 export function getAvailableOpanelVersions(files: FileInfo[]): string[] {
   const versions = new Set(files.map(file => file.version));
