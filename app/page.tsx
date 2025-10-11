@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { Download } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -16,13 +17,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import BrandIcon from "@/assets/brand-light.svg";
 import { api, filterFilesByPlatform, filterFilesByGameVersion, filterFilesByOpanelVersion, getAvailablePlatforms, getAvailableGameVersions, getAvailableOpanelVersions, getSupportedVersions } from "@/lib/api";
-import { FileInfo, FilterOptions } from "@/lib/types";
+import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
+import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
 
 export default function Home() {
   // 状态管理
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<FileInfo[]>([]);
+  const [downloadSource, setDownloadSource] = useState<DownloadSource>("opanel");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -30,8 +33,7 @@ export default function Home() {
   const [filters, setFilters] = useState<FilterOptions>({
     server: "all",
     gameVersion: "all",
-    opanelVersion: "all",
-    downloadSource: "opanel"
+    opanelVersion: "all"
   });
 
   // 可用选项
@@ -85,7 +87,7 @@ export default function Home() {
   // 处理下载
   const handleDownload = async (file: FileInfo) => {
     try {
-      await api.downloadFile(file.version, file.name);
+      await api.downloadFile(file.version, file.name, downloadSource);
     } catch (err) {
       console.error('Download failed:', err);
       // 可以添加错误提示
@@ -135,8 +137,19 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col items-center gap-14 border-b-1 pb-3">
-        <Image src={BrandIcon} alt="brand" width={300}/>
+      <div className="flex flex-col items-center gap-4 border-b-1 pb-3">
+        <span className="mb-10">
+          <a href="https://opanel.cn" target="_blank">
+            <Image src={BrandIcon} alt="brand" width={300}/>
+          </a>
+        </span>
+        <span className="w-full text-sm text-muted-foreground">如果下载速度缓慢或者无法下载，可以尝试切换下载源。</span>
+        <span className="w-full text-sm text-muted-foreground">
+          AcmeCloud下载源由云上极致提供：
+          <a className="inline-block align-middle" href="https://acmecloud.cn" target="_blank">
+            <Image src={AcmeCloudLogo} alt="acmecloud-logo" width={100}/>
+          </a>
+        </span>
         <div className="w-full flex gap-2 max-sm:grid grid-cols-2 grid-rows-2 [&_label]:text-sm [&>*]:flex-1">
           <div className="flex flex-col gap-2">
             <Label>服务端</Label>
@@ -188,13 +201,13 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-2">
             <Label>下载源</Label>
-            <Select value={filters.downloadSource} onValueChange={(value) => updateFilter('downloadSource', value)}>
+            <Select value={downloadSource} onValueChange={(value: DownloadSource) => setDownloadSource(value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="选择下载源..."/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="opanel">OPanel</SelectItem>
-                {/* <SelectItem value="chuqiyun">初七云</SelectItem> */}
+                <SelectItem value="acmecloud">AcmeCloud</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -219,7 +232,15 @@ export default function Home() {
             <TableBody>
               {filteredFiles.map((file, index) => (
                 <TableRow key={`${file.name}-${index}`}>
-                  <TableCell className="font-medium">{file.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Button
+                      variant="link"
+                      className="cursor-pointer"
+                      onClick={() => handleDownload(file)}
+                    >
+                      {file.name}
+                    </Button>
+                  </TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline">
                       {file.platform.charAt(0).toUpperCase() + file.platform.slice(1)}
@@ -239,6 +260,7 @@ export default function Home() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="cursor-pointer"
                       onClick={() => handleDownload(file)}
                       title={`下载 ${file.name}`}
                     >

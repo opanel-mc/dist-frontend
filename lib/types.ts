@@ -51,5 +51,6 @@ export interface FilterOptions {
   server: string;
   gameVersion: string;
   opanelVersion: string;
-  downloadSource: string;
 }
+
+export type DownloadSource = "opanel" | "acmecloud";

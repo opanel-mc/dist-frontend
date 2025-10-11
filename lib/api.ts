@@ -1,9 +1,10 @@
-import { VersionInfo, CachedFilesResponse, SystemStats, FileInfo } from './types';
+import { VersionInfo, CachedFilesResponse, SystemStats, FileInfo, DownloadSource } from './types';
 import { mockCachedFilesResponse } from './mock-data';
 import supportedVersionList from "@/data/supported-version-list.json";
 
 // API基础配置
 const API_BASE_URL = 'https://opanel-dl.hugo.net.cn';
+const ACMECLOUD_SOURCE_BASE_URL = "https://mirrors.acmecloud.cn";
 const DEFAULT_REPO = 'opanel-mc/opanel';
 
 // 通用API请求函数
@@ -97,14 +98,17 @@ export const api = {
   },
 
   // 获取下载链接
-  getDownloadUrl(version: string, filename: string): string {
-    return `${API_BASE_URL}/api/download/${encodeURIComponent(version)}/${encodeURIComponent(filename)}`;
+  getDownloadUrl(version: string, filename: string, source: DownloadSource): string {
+    switch(source) {
+      case "opanel": return `${API_BASE_URL}/api/download/${encodeURIComponent(version)}/${encodeURIComponent(filename)}`;
+      case "acmecloud": return `${ACMECLOUD_SOURCE_BASE_URL}/opanel/${encodeURIComponent(version)}/${encodeURIComponent(filename)}`;
+    }
   },
 
   // 直接下载文件
-  async downloadFile(version: string, filename: string): Promise<void> {
+  async downloadFile(version: string, filename: string, source: DownloadSource): Promise<void> {
     try {
-      const url = this.getDownloadUrl(version, filename);
+      const url = this.getDownloadUrl(version, filename, source);
       
       // 检查后端是否可用
       const response = await fetch(`${API_BASE_URL}/health`, { 
