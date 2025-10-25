@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="zh-cn">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <main className="h-screen px-[400px] max-xl:px-[300px] max-lg:px-20 max-md:px-11 py-10">
+        <main className="h-screen px-[400px] max-xl:px-[200px] max-lg:px-20 max-md:px-8 py-10">
           {children}
           <Footer />
         </main>

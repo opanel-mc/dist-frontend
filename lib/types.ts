@@ -10,6 +10,7 @@ export interface FileInfo {
   platform: string;
   mc_version: string;
   version: string;
+  digest: string;
 }
 
 export interface VersionInfo {

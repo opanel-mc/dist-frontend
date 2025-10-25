@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Download } from "lucide-react";
+import { Download, FileDigit } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import {
   Select,
@@ -20,6 +20,7 @@ import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
 import supportedVersionList from "@/data/supported-version-list.json";
 import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
+import { copyToClipboard } from "@/lib/utils";
 
 export default function Home() {
   // 状态管理
@@ -94,6 +95,11 @@ export default function Home() {
     
     setFilteredFiles(filtered);
   }, [files, filters]);
+
+  const handleCopyDigest = async (digest: string) => {
+    await copyToClipboard(digest);
+    alert(`复制成功\nsha256:${digest}`);
+  }
 
   // 处理下载
   const handleDownload = async (file: FileInfo) => {
@@ -246,7 +252,7 @@ export default function Home() {
                   <TableCell className="font-medium">
                     <Button
                       variant="link"
-                      className="cursor-pointer"
+                      className="cursor-pointer p-0"
                       onClick={() => handleDownload(file)}
                     >
                       {file.name}
@@ -268,6 +274,15 @@ export default function Home() {
                     {formatFileSize(file.size_mb)}
                   </TableCell>
                   <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="cursor-pointer"
+                      onClick={() => handleCopyDigest(file.digest)}
+                      title={`复制sha256摘要`}
+                    >
+                      <FileDigit />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
