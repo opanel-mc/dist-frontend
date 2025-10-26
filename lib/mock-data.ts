@@ -11,7 +11,8 @@ export const mockFiles: FileInfo[] = [
     download_url: "/api/download/1.0.0rc7/opanel-bukkit-1.21-build-1.0.0rc7.jar",
     platform: "bukkit",
     mc_version: "1.21",
-    version: "1.0.0rc7"
+    version: "1.0.0rc7",
+    digest: "<digest>"
   },
   {
     name: "opanel-fabric-1.21-build-1.0.0rc7.jar",
@@ -22,7 +23,8 @@ export const mockFiles: FileInfo[] = [
     download_url: "/api/download/1.0.0rc7/opanel-fabric-1.21-build-1.0.0rc7.jar",
     platform: "fabric",
     mc_version: "1.21",
-    version: "1.0.0rc7"
+    version: "1.0.0rc7",
+    digest: "<digest>"
   },
   {
     name: "opanel-forge-1.21-build-1.0.0rc7.jar",
@@ -33,7 +35,8 @@ export const mockFiles: FileInfo[] = [
     download_url: "/api/download/1.0.0rc7/opanel-forge-1.21-build-1.0.0rc7.jar",
     platform: "forge",
     mc_version: "1.21",
-    version: "1.0.0rc7"
+    version: "1.0.0rc7",
+    digest: "<digest>"
   },
   {
     name: "opanel-neoforge-1.21-build-1.0.0rc7.jar",
@@ -44,7 +47,8 @@ export const mockFiles: FileInfo[] = [
     download_url: "/api/download/1.0.0rc7/opanel-neoforge-1.21-build-1.0.0rc7.jar",
     platform: "neoforge",
     mc_version: "1.21",
-    version: "1.0.0rc7"
+    version: "1.0.0rc7",
+    digest: "<digest>"
   },
   {
     name: "opanel-folia-1.21-build-1.0.0rc7.jar",
@@ -55,7 +59,8 @@ export const mockFiles: FileInfo[] = [
     download_url: "/api/download/1.0.0rc7/opanel-folia-1.21-build-1.0.0rc7.jar",
     platform: "folia",
     mc_version: "1.21",
-    version: "1.0.0rc7"
+    version: "1.0.0rc7",
+    digest: "<digest>"
   },
   {
     name: "opanel-bukkit-1.21-build-1.0.0rc6.jar",
@@ -66,7 +71,8 @@ export const mockFiles: FileInfo[] = [
     download_url: "/api/download/1.0.0rc6/opanel-bukkit-1.21-build-1.0.0rc6.jar",
     platform: "bukkit",
     mc_version: "1.21",
-    version: "1.0.0rc6"
+    version: "1.0.0rc6",
+    digest: "<digest>"
   }
 ];
 
