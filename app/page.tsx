@@ -26,7 +26,7 @@ export default function Home() {
   // 状态管理
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<FileInfo[]>([]);
-  const [downloadSource, setDownloadSource] = useState<DownloadSource>("opanel");
+  const [downloadSource, setDownloadSource] = useState<DownloadSource>("acmecloud");
   const availableGameVersions = useMemo(() => {
     const list: string[] = [];
     for(const versionMap of Object.values(supportedVersionList)) {
