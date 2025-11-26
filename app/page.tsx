@@ -225,6 +225,7 @@ export default function Home() {
               <SelectContent>
                 <SelectItem value="opanel">OPanel</SelectItem>
                 <SelectItem value="acmecloud">AcmeCloud</SelectItem>
+                <SelectItem value="github">GitHub</SelectItem>
               </SelectContent>
             </Select>
           </div>
