@@ -241,6 +241,7 @@ export default function Home() {
             <TableHeader>
               <TableRow>
                 <TableHead>文件名</TableHead>
+                <TableHead>版本</TableHead>
                 <TableHead className="text-center">平台</TableHead>
                 <TableHead>游戏版本</TableHead>
                 <TableHead className="text-center">文件大小</TableHead>
@@ -258,6 +259,20 @@ export default function Home() {
                     >
                       {file.name}
                     </Button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-full flex items-center gap-2">
+                      <span>{file.version}</span>
+                      {
+                        file.version.includes("pre") || file.version.includes("rc")
+                        ? (
+                          <Badge className="bg-yellow-50 border-yellow-500 text-yellow-800">测试版</Badge>
+                        )
+                        : (
+                          <Badge className="bg-green-100 border-green-600 text-green-900">正式版</Badge>
+                        )
+                      }
+                    </div>
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline">
