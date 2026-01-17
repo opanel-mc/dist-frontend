@@ -21,6 +21,7 @@ import { Spinner } from "@/components/ui/spinner";
 import supportedVersionList from "@/data/supported-version-list.json";
 import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
 import { copyToClipboard } from "@/lib/utils";
+import Link from "next/link";
 
 export default function Home() {
   // 状态管理
@@ -100,16 +101,6 @@ export default function Home() {
     await copyToClipboard(digest);
     alert(`复制成功\nsha256:${digest}`);
   }
-
-  // 处理下载
-  const handleDownload = async (file: FileInfo) => {
-    try {
-      await api.downloadFile(file.version, file.name, downloadSource);
-    } catch (err) {
-      console.error('Download failed:', err);
-      // 可以添加错误提示
-    }
-  };
 
   // 更新筛选器
   const updateFilter = (key: keyof FilterOptions, value: string) => {
@@ -255,9 +246,9 @@ export default function Home() {
                     <Button
                       variant="link"
                       className="cursor-pointer p-0"
-                      onClick={() => handleDownload(file)}
+                      asChild
                     >
-                      {file.name}
+                      <Link href={api.getDownloadUrl(file.version, file.name, downloadSource)}>{file.name}</Link>
                     </Button>
                   </TableCell>
                   <TableCell>
@@ -303,10 +294,12 @@ export default function Home() {
                       variant="ghost"
                       size="icon"
                       className="cursor-pointer"
-                      onClick={() => handleDownload(file)}
                       title={`下载 ${file.name}`}
+                      asChild
                     >
-                      <Download />
+                      <Link href={api.getDownloadUrl(file.version, file.name, downloadSource)}>
+                        <Download />
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>

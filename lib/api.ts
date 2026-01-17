@@ -107,30 +107,6 @@ export const api = {
     }
   },
 
-  // 直接下载文件
-  async downloadFile(version: string, filename: string, source: DownloadSource): Promise<void> {
-    try {
-      const url = this.getDownloadUrl(version, filename, source);
-      
-      // 检查后端是否可用
-      const response = await fetch(`${API_BASE_URL}/health`, { 
-        method: 'GET',
-        signal: AbortSignal.timeout(3000) // 3秒超时
-      });
-      
-      if (response.ok) {
-        // 后端可用，直接下载
-        window.open(url, '_blank');
-      } else {
-        throw new Error('Backend not available');
-      }
-    } catch (error) {
-      console.warn('后端服务不可用，无法下载文件:', error);
-      // 可以显示错误提示或提供其他下载方式
-      alert('下载功能需要后端服务支持。请确保后端服务正在运行 (http://localhost:8000)');
-    }
-  },
-
   // 手动触发更新检查
   async triggerUpdateCheck(repo: string = DEFAULT_REPO): Promise<void> {
     try {
