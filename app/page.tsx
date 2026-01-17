@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Download, FileDigit } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
+import { compare } from "semver";
 import {
   Select,
   SelectContent,
@@ -21,7 +23,6 @@ import { Spinner } from "@/components/ui/spinner";
 import supportedVersionList from "@/data/supported-version-list.json";
 import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
 import { copyToClipboard } from "@/lib/utils";
-import Link from "next/link";
 
 export default function Home() {
   // 状态管理
@@ -64,11 +65,12 @@ export default function Home() {
         
         // 获取所有缓存文件
         const response = await api.getAllCachedFiles();
-        setFiles(response.files);
+        const sortedFileList = response.files.sort((a, b) => -compare(a.version, b.version));
+        setFiles(sortedFileList);
         
         // 设置可用选项
-        setAvailablePlatforms(getAvailablePlatforms(response.files));
-        setAvailableOpanelVersions(getAvailableOpanelVersions(response.files));
+        setAvailablePlatforms(getAvailablePlatforms(sortedFileList));
+        setAvailableOpanelVersions(getAvailableOpanelVersions(sortedFileList));
         
       } catch (err) {
         setError(err instanceof Error ? err.message : '加载数据失败');
