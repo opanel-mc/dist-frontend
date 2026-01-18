@@ -51,7 +51,7 @@ export interface ApiError {
 export interface FilterOptions {
   server: string;
   gameVersion: string;
-  opanelVersion: string;
+  preview: boolean;
 }
 
 export type DownloadSource = "opanel" | "acmecloud" | "github";

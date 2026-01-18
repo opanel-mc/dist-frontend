@@ -12,3 +12,7 @@ export async function copyToClipboard(str: string) {
     console.error('Could not copy text: ', err);
   }
 }
+
+export function isPreviewVersion(version: string) {
+  return version.includes("pre") || version.includes("rc");
+}

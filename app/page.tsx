@@ -22,7 +22,8 @@ import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
 import supportedVersionList from "@/data/supported-version-list.json";
 import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
-import { copyToClipboard } from "@/lib/utils";
+import { copyToClipboard, isPreviewVersion } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 export default function Home() {
   // 状态管理
@@ -49,7 +50,7 @@ export default function Home() {
   const [filters, setFilters] = useState<FilterOptions>({
     server: "all",
     gameVersion: "all",
-    opanelVersion: "all"
+    preview: true
   });
 
   // 可用选项
@@ -93,8 +94,10 @@ export default function Home() {
     // 按游戏版本筛选
     filtered = filterFilesByGameVersion(filtered, filters.gameVersion);
     
-    // 按OPanel版本筛选
-    filtered = filterFilesByOpanelVersion(filtered, filters.opanelVersion);
+    // 按预览版筛选
+    if(!filters.preview) {
+      filtered = filtered.filter(({ version }) => !isPreviewVersion(version));
+    }
     
     setFilteredFiles(filtered);
   }, [files, filters]);
@@ -105,9 +108,9 @@ export default function Home() {
   }
 
   // 更新筛选器
-  const updateFilter = (key: keyof FilterOptions, value: string) => {
+  function updateFilter<F extends keyof FilterOptions>(key: F, value: FilterOptions[F]) {
     setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  }
 
   // 格式化文件大小
   const formatFileSize = (sizeMb: number): string => {
@@ -194,22 +197,6 @@ export default function Home() {
             </Select>
           </div>
           <div className="flex flex-col gap-2">
-            <Label>OPanel 版本</Label>
-            <Select value={filters.opanelVersion} onValueChange={(value) => updateFilter('opanelVersion', value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="选择OPanel版本..."/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部</SelectItem>
-                {availableOpanelVersions.map(version => (
-                  <SelectItem key={version} value={version}>
-                    {version}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-2">
             <Label>下载源</Label>
             <Select value={downloadSource} onValueChange={(value: DownloadSource) => setDownloadSource(value)}>
               <SelectTrigger className="w-full">
@@ -221,6 +208,10 @@ export default function Home() {
                 <SelectItem value="github">GitHub</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="max-w-fit ml-2 pb-3 flex justify-end items-end gap-2">
+            <Label>显示预览版</Label>
+            <Switch checked={filters.preview} onCheckedChange={(value) => updateFilter('preview', value)}/>
           </div>
         </div>
       </div>
@@ -257,9 +248,9 @@ export default function Home() {
                     <div className="h-full flex items-center gap-2">
                       <span>{file.version}</span>
                       {
-                        file.version.includes("pre") || file.version.includes("rc")
+                        isPreviewVersion(file.version)
                         ? (
-                          <Badge className="bg-yellow-50 border-yellow-500 text-yellow-800">测试版</Badge>
+                          <Badge className="bg-yellow-50 border-yellow-500 text-yellow-800">预览版</Badge>
                         )
                         : (
                           <Badge className="bg-green-100 border-green-600 text-green-900">正式版</Badge>
