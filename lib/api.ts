@@ -4,7 +4,6 @@ import supportedVersionList from "@/data/supported-version-list.json";
 
 // API基础配置
 const API_BASE_URL = 'https://opanel-dl.hugo.net.cn';
-const ACMECLOUD_SOURCE_BASE_URL = "https://mirrors.acmecloud.cn";
 const GITHUB_SOURCE_BASE_URL = "https://github.com";
 const DEFAULT_REPO = 'opanel-mc/opanel';
 
@@ -102,7 +101,6 @@ export const api = {
   getDownloadUrl(version: string, filename: string, source: DownloadSource): string {
     switch(source) {
       case "opanel": return `${API_BASE_URL}/api/download/${encodeURIComponent(version)}/${encodeURIComponent(filename)}`;
-      case "acmecloud": return `${ACMECLOUD_SOURCE_BASE_URL}/opanel/${encodeURIComponent(version)}/${encodeURIComponent(filename)}`;
       case "github": return `${GITHUB_SOURCE_BASE_URL}/opanel-mc/opanel/releases/download/${encodeURIComponent(version)}/${encodeURIComponent(filename)}`;
     }
   },

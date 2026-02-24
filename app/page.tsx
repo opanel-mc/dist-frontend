@@ -21,7 +21,6 @@ import { api, filterFilesByPlatform, filterFilesByGameVersion, filterFilesByOpan
 import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
 import supportedVersionList from "@/data/supported-version-list.json";
-import AcmeCloudLogo from "@/assets/acmecloud-logo.png";
 import { copyToClipboard, isPreviewVersion } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 
@@ -157,12 +156,6 @@ export default function Home() {
           </a>
         </span>
         <span className="w-full text-sm text-muted-foreground">如果下载速度缓慢或者无法下载，可以尝试切换下载源。</span>
-        <span className="w-full text-sm text-muted-foreground">
-          AcmeCloud下载源由云上极致提供：
-          <a className="inline-block align-middle" href="https://acmecloud.cn" target="_blank">
-            <Image src={AcmeCloudLogo} alt="acmecloud-logo" width={100}/>
-          </a>
-        </span>
         <div className="w-full flex gap-2 max-sm:grid grid-cols-2 grid-rows-2 [&_label]:text-sm [&>*]:flex-1">
           <div className="flex flex-col gap-2">
             <Label>服务端</Label>
@@ -204,7 +197,6 @@ export default function Home() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="opanel">OPanel</SelectItem>
-                <SelectItem value="acmecloud">AcmeCloud</SelectItem>
                 <SelectItem value="github">GitHub</SelectItem>
               </SelectContent>
             </Select>

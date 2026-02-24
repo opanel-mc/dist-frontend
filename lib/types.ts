@@ -54,4 +54,4 @@ export interface FilterOptions {
   preview: boolean;
 }
 
-export type DownloadSource = "opanel" | "acmecloud" | "github";
+export type DownloadSource = "opanel" | "github";
