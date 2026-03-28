@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import BrandIcon from "@/assets/brand-light.svg";
-import { api, filterFilesByPlatform, filterFilesByGameVersion, filterFilesByOpanelVersion, getAvailablePlatforms, getAvailableOpanelVersions, getSupportedVersions } from "@/lib/api";
+import { api, filterFilesByPlatform, filterFilesByGameVersion, getAvailablePlatforms, getAvailableOpanelVersions, getSupportedVersions } from "@/lib/api";
 import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
 import { Spinner } from "@/components/ui/spinner";
 import supportedVersionList from "@/data/supported-version-list.json";
