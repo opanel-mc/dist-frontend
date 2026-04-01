@@ -65,7 +65,11 @@ export default function Home() {
         
         // 获取所有缓存文件
         const response = await api.getAllCachedFiles();
-        const sortedFileList = response.files.sort((a, b) => -compare(a.version, b.version));
+        const sortedFileList = response.files.sort((a, b) => {
+          if(a.version === "2.0.0-preinfty") return -1;
+          if(b.version === "2.0.0-preinfty") return 1;
+          return -compare(a.version, b.version);
+        });
         setFiles(sortedFileList);
         
         // 设置可用选项
