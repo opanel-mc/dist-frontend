@@ -1,300 +1,108 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { Download, FileDigit } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
-import { compare } from "semver";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import BrandIcon from "@/assets/brand-light.svg";
-import { api, filterFilesByPlatform, filterFilesByGameVersion, getAvailablePlatforms, getAvailableOpanelVersions, getSupportedVersions } from "@/lib/api";
-import { DownloadSource, FileInfo, FilterOptions } from "@/lib/types";
-import { Spinner } from "@/components/ui/spinner";
+import { useEffect, useState } from "react";
+import LogoIcon from "@/assets/logo.png";
+import { DownloadButton } from "@/components/download-button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { latestPreviewVersion, latestStableVersion } from "@/lib/global";
 import supportedVersionList from "@/data/supported-version-list.json";
-import { copyToClipboard, isPreviewVersion } from "@/lib/utils";
-import { Switch } from "@/components/ui/switch";
+import { getDownloadUrl } from "@/lib/api";
+
+type Platform = keyof typeof supportedVersionList;
+
+function getMinVersionForMcVersion(platform: Platform, mcVersion: string): string | null {
+  const platformData = supportedVersionList[platform];
+  for(const [minVersion, supportedVersions] of Object.entries(platformData)) {
+    if(supportedVersions.includes(mcVersion)) {
+      return minVersion;
+    }
+  }
+  return null;
+}
 
 export default function Home() {
-  // 状态管理
-  const [files, setFiles] = useState<FileInfo[]>([]);
-  const [filteredFiles, setFilteredFiles] = useState<FileInfo[]>([]);
-  const [downloadSource, setDownloadSource] = useState<DownloadSource>("opanel");
-  const availableGameVersions = useMemo(() => {
-    const list: string[] = [];
-    for(const versionMap of Object.values(supportedVersionList)) {
-      for(const versions of Object.values(versionMap)) {
-        for(const version of versions) {
-          if(!list.includes(version)) {
-            list.push(version);
-          }
-        }
-      }
-    }
-    return list.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
-  }, [supportedVersionList]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // 筛选选项状态
-  const [filters, setFilters] = useState<FilterOptions>({
-    server: "all",
-    gameVersion: "all",
-    preview: true
-  });
+  const [platform, setPlatform] = useState<Platform | "">("");
+  const [mcVersion, setMcVersion] = useState<string>("");
+  const [stableUrl, setStableUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // 可用选项
-  const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([]);
-  const [availableOpanelVersions, setAvailableOpanelVersions] = useState<string[]>([]);
+  const selectedPlatformData = platform ? supportedVersionList[platform] : null;
+  const minVersion = platform && mcVersion ? getMinVersionForMcVersion(platform, mcVersion) : null;
 
-  // 加载数据
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // 获取所有缓存文件
-        const response = await api.getAllCachedFiles();
-        const sortedFileList = response.files
-          .filter((file) => file.version !== "2.0.0-preinfty")
-          .sort((a, b) => -compare(a.version, b.version));
-        setFiles(sortedFileList);
-        
-        // 设置可用选项
-        setAvailablePlatforms(getAvailablePlatforms(sortedFileList));
-        setAvailableOpanelVersions(getAvailableOpanelVersions(sortedFileList));
-        
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '加载数据失败');
-        console.error('Failed to load data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  // 应用筛选
-  useEffect(() => {
-    let filtered = files;
-    
-    // 按平台筛选
-    filtered = filterFilesByPlatform(filtered, filters.server);
-    
-    // 按游戏版本筛选
-    filtered = filterFilesByGameVersion(filtered, filters.gameVersion);
-    
-    // 按预览版筛选
-    if(!filters.preview) {
-      filtered = filtered.filter(({ version }) => !isPreviewVersion(version));
-    }
-    
-    setFilteredFiles(filtered);
-  }, [files, filters]);
-
-  const handleCopyDigest = async (digest: string) => {
-    await copyToClipboard(digest);
-    alert(`复制成功\nsha256:${digest}`);
-  }
-
-  // 更新筛选器
-  function updateFilter<F extends keyof FilterOptions>(key: F, value: FilterOptions[F]) {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  }
-
-  // 格式化文件大小
-  const formatFileSize = (sizeMb: number): string => {
-    if (sizeMb < 1) {
-      return `${(sizeMb * 1024).toFixed(1)} KB`;
-    }
-    return `${sizeMb.toFixed(1)} MB`;
+  const handlePlatformChange = (value: Platform) => {
+    setPlatform(value);
+    setMcVersion("");
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col items-center gap-14 border-b-1 pb-3">
-          <Image src={BrandIcon} alt="brand" width={300}/>
-          <div className="text-center flex items-center gap-2">
-            <Spinner />
-            加载中...
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleMcVersionChange = (value: string) => {
+    setMcVersion(value);
+  };
 
-  if (error) {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col items-center gap-14 border-b-1 pb-3">
-          <Image src={BrandIcon} alt="brand" width={300}/>
-          <div className="text-center text-red-500">
-            <p>加载失败: {error}</p>
-            <p className="text-sm text-gray-500 mt-2">请确保后端服务正在运行 (http://localhost:8000)</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if(!platform || !minVersion) return;
+
+    setStableUrl(getDownloadUrl(platform, minVersion, latestStableVersion));
+    if(latestPreviewVersion) {
+      setPreviewUrl(getDownloadUrl(platform, minVersion, latestPreviewVersion));
+    }
+  }, [platform, minVersion]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col items-center gap-4 border-b-1 pb-3">
-        <span className="mb-10">
-          <a href="https://opanel.cn" target="_blank">
-            <Image src={BrandIcon} alt="brand" width={300}/>
-          </a>
-        </span>
-        <span className="w-full text-sm text-muted-foreground">如果下载速度缓慢或者无法下载，可以尝试切换下载源。</span>
-        <div className="w-full flex gap-2 max-sm:grid grid-cols-2 grid-rows-2 [&_label]:text-sm [&>*]:flex-1">
-          <div className="flex flex-col gap-2">
-            <Label>服务端</Label>
-            <Select value={filters.server} onValueChange={(value) => updateFilter('server', value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="选择服务端..."/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部</SelectItem>
-                {availablePlatforms.map(platform => (
-                  <SelectItem key={platform} value={platform}>
-                    {platform.charAt(0).toUpperCase() + platform.slice(1)}
+    <main className="flex flex-col items-center gap-2">
+      <img
+        src={LogoIcon.src}
+        alt="opanel-logo"
+        className="w-32 drop-shadow-2xl"
+        style={{ imageRendering: "pixelated" }}/>
+      <h1 className="text-xl font-semibold">OPanel 资源库</h1>
+
+      <div className="w-72 mt-4 flex flex-col gap-2 *:w-full">
+        <Select value={platform} onValueChange={handlePlatformChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="请选择服务端平台..."/>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="bukkit">Bukkit / Spigot / Paper / Leaves</SelectItem>
+            <SelectItem value="folia">Folia</SelectItem>
+            <SelectItem value="fabric">Fabric</SelectItem>
+            <SelectItem value="forge">Forge</SelectItem>
+            <SelectItem value="neoforge">NeoForge</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {platform && (
+          <Select value={mcVersion} onValueChange={handleMcVersionChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="请选择Minecraft版本..."/>
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(selectedPlatformData ?? {}).flatMap(([, versions]) =>
+                versions.map((v) => (
+                  <SelectItem key={v} value={v}>
+                    {v}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>游戏版本</Label>
-            <Select value={filters.gameVersion} onValueChange={(value) => updateFilter('gameVersion', value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="选择游戏版本..."/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">全部</SelectItem>
-                {availableGameVersions.map(version => (
-                  <SelectItem key={version} value={version}>
-                    {version}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>下载源</Label>
-            <Select value={downloadSource} onValueChange={(value: DownloadSource) => setDownloadSource(value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="选择下载源..."/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="opanel">OPanel</SelectItem>
-                <SelectItem value="github">GitHub</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="max-w-fit ml-2 pb-3 flex justify-end items-end gap-2">
-            <Label>显示预览版</Label>
-            <Switch checked={filters.preview} onCheckedChange={(value) => updateFilter('preview', value)}/>
-          </div>
-        </div>
-      </div>
-      <div className="flex-1 h-full">
-        {filteredFiles.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            没有找到匹配的文件
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>文件名</TableHead>
-                <TableHead>版本</TableHead>
-                <TableHead className="text-center">平台</TableHead>
-                <TableHead>游戏版本</TableHead>
-                <TableHead className="text-center">文件大小</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredFiles.map((file, index) => (
-                <TableRow key={`${file.name}-${index}`}>
-                  <TableCell className="font-medium">
-                    <Button
-                      variant="link"
-                      className="cursor-pointer p-0"
-                      asChild
-                    >
-                      <Link href={api.getDownloadUrl(file.version, file.name, downloadSource)}>{file.name}</Link>
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <div className="h-full flex items-center gap-2">
-                      <span>{file.version}</span>
-                      {
-                        isPreviewVersion(file.version)
-                        ? (
-                          <Badge className="bg-yellow-50 border-yellow-500 text-yellow-800">预览版</Badge>
-                        )
-                        : (
-                          <Badge className="bg-green-100 border-green-600 text-green-900">正式版</Badge>
-                        )
-                      }
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant="outline">
-                      {file.platform.charAt(0).toUpperCase() + file.platform.slice(1)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="[&>*]:inline-block w-44 wrap-anywhere whitespace-pre-wrap">
-                    {getSupportedVersions(file).map(version => (
-                      <Badge key={version} variant="secondary" className="mr-1 mb-1">
-                        {version}
-                      </Badge>
-                    ))}
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-gray-600">
-                    {formatFileSize(file.size_mb)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="cursor-pointer"
-                      onClick={() => handleCopyDigest(file.digest)}
-                      title={`复制sha256摘要`}
-                    >
-                      <FileDigit />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="cursor-pointer"
-                      title={`下载 ${file.name}`}
-                      asChild
-                    >
-                      <Link href={api.getDownloadUrl(file.version, file.name, downloadSource)}>
-                        <Download />
-                      </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                ))
+              )}
+            </SelectContent>
+          </Select>
         )}
       </div>
-    </div>
+
+      {platform && mcVersion && (
+        <div className="w-full mt-4 flex flex-col gap-2 [&_code]:font-(family-name:--font-google-sans-code)! [&_code]:text-xs">
+          <DownloadButton
+            version={latestStableVersion}
+            label="稳定版"
+            isStable
+            link={stableUrl ?? ""}/>
+          {latestPreviewVersion && (
+            <DownloadButton
+              version={latestPreviewVersion}
+              label="预览版"
+              link={previewUrl ?? ""}/>
+          )}
+        </div>
+      )}
+    </main>
   );
 }
