@@ -11,6 +11,7 @@ export interface ReleaseAsset {
   opanelVersion: string;
   size: number;
   createdAt: string;
+  digest?: string;
 }
 
 export interface Release {

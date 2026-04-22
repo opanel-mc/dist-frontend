@@ -121,5 +121,8 @@
     a {
       @apply underline underline-offset-2 decoration-1;
     }
+    ::selection {
+      @apply bg-foreground text-background;
+    }
   }
 }

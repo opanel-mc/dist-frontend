@@ -101,7 +101,7 @@ export default function Home() {
       </div>
 
       {platform && mcVersion && (
-        <div className="w-full mt-4 flex flex-col gap-2 [&_code]:font-(family-name:--font-google-sans-code)! [&_code]:text-xs">
+        <div className="w-full mt-4 flex flex-col gap-4 [&_code]:font-(family-name:--font-google-sans-code)! [&_code]:text-xs">
           {releasesLoading ? (
             <div className="flex justify-center py-2">
               <Spinner className="size-5"/>
@@ -113,13 +113,15 @@ export default function Home() {
                   version={latestStableVersion}
                   label="稳定版"
                   isStable
-                  link={getDownloadUrl(stableAsset.id)}/>
+                  link={getDownloadUrl(stableAsset.id)}
+                  digest={stableAsset.digest}/>
               )}
               {previewAsset && latestPreviewVersion && (
                 <DownloadButton
                   version={latestPreviewVersion}
                   label="预览版"
-                  link={getDownloadUrl(previewAsset.id)}/>
+                  link={getDownloadUrl(previewAsset.id)}
+                  digest={previewAsset.digest}/>
               )}
               {!stableAsset && !previewAsset && (
                 <p className="text-center text-sm text-muted-foreground">此平台暂无可用下载</p>
