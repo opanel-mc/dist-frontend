@@ -3,10 +3,17 @@
 import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo.png";
 import { DownloadButton } from "@/components/download-button";
+import { Spinner } from "@/components/ui/spinner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { latestPreviewVersion, latestStableVersion } from "@/lib/global";
 import supportedVersionList from "@/data/supported-version-list.json";
-import { getDownloadUrl } from "@/lib/api";
+import {
+  fetchReleases,
+  getLatestStableVersion,
+  getLatestPreviewVersion,
+  findAsset,
+  getDownloadUrl,
+  type ReleasesResponse,
+} from "@/lib/api";
 
 type Platform = keyof typeof supportedVersionList;
 
@@ -23,29 +30,34 @@ function getMinVersionForMcVersion(platform: Platform, mcVersion: string): strin
 export default function Home() {
   const [platform, setPlatform] = useState<Platform | "">("");
   const [mcVersion, setMcVersion] = useState<string>("");
-  const [stableUrl, setStableUrl] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [releases, setReleases] = useState<ReleasesResponse | null>(null);
+  const [releasesLoading, setReleasesLoading] = useState(true);
 
   const selectedPlatformData = platform ? supportedVersionList[platform] : null;
   const minVersion = platform && mcVersion ? getMinVersionForMcVersion(platform, mcVersion) : null;
+
+  const latestStableVersion = releases ? getLatestStableVersion(releases) : null;
+  const latestPreviewVersion = releases ? getLatestPreviewVersion(releases) : null;
+
+  const stableAsset = releases && platform && minVersion && latestStableVersion
+    ? findAsset(releases, latestStableVersion, platform, minVersion)
+    : null;
+  const previewAsset = releases && platform && minVersion && latestPreviewVersion
+    ? findAsset(releases, latestPreviewVersion, platform, minVersion)
+    : null;
 
   const handlePlatformChange = (value: Platform) => {
     setPlatform(value);
     setMcVersion("");
   };
 
-  const handleMcVersionChange = (value: string) => {
-    setMcVersion(value);
-  };
-
   useEffect(() => {
-    if(!platform || !minVersion) return;
-
-    setStableUrl(getDownloadUrl(platform, minVersion, latestStableVersion));
-    if(latestPreviewVersion) {
-      setPreviewUrl(getDownloadUrl(platform, minVersion, latestPreviewVersion));
-    }
-  }, [platform, minVersion]);
+    setReleasesLoading(true);
+    fetchReleases()
+      .then(setReleases)
+      .catch(console.error)
+      .finally(() => setReleasesLoading(false));
+  }, []);
 
   return (
     <main className="flex flex-col items-center gap-2">
@@ -71,7 +83,7 @@ export default function Home() {
         </Select>
 
         {platform && (
-          <Select value={mcVersion} onValueChange={handleMcVersionChange}>
+          <Select value={mcVersion} onValueChange={setMcVersion}>
             <SelectTrigger>
               <SelectValue placeholder="请选择Minecraft版本..."/>
             </SelectTrigger>
@@ -90,16 +102,29 @@ export default function Home() {
 
       {platform && mcVersion && (
         <div className="w-full mt-4 flex flex-col gap-2 [&_code]:font-(family-name:--font-google-sans-code)! [&_code]:text-xs">
-          <DownloadButton
-            version={latestStableVersion}
-            label="稳定版"
-            isStable
-            link={stableUrl ?? ""}/>
-          {latestPreviewVersion && (
-            <DownloadButton
-              version={latestPreviewVersion}
-              label="预览版"
-              link={previewUrl ?? ""}/>
+          {releasesLoading ? (
+            <div className="flex justify-center py-2">
+              <Spinner className="size-5"/>
+            </div>
+          ) : (
+            <>
+              {stableAsset && latestStableVersion && (
+                <DownloadButton
+                  version={latestStableVersion}
+                  label="稳定版"
+                  isStable
+                  link={getDownloadUrl(stableAsset.id)}/>
+              )}
+              {previewAsset && latestPreviewVersion && (
+                <DownloadButton
+                  version={latestPreviewVersion}
+                  label="预览版"
+                  link={getDownloadUrl(previewAsset.id)}/>
+              )}
+              {!stableAsset && !previewAsset && (
+                <p className="text-center text-sm text-muted-foreground">此平台暂无可用下载</p>
+              )}
+            </>
           )}
         </div>
       )}
