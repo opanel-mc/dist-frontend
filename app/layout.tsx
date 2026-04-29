@@ -1,18 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { Footer } from "./footer";
 import LogoIcon from "@/assets/logo.png";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { cn } from "@/lib/utils";
+import { googleSansCode, notoSansSC } from "@/lib/fonts";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
   title: "OPanel 资源库",
@@ -26,12 +19,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-cn">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <main className="h-screen px-[400px] max-xl:px-[200px] max-lg:px-20 max-md:px-8 py-10">
+    <html lang="zh-cn" suppressHydrationWarning>
+      <body className={cn("flex flex-col justify-center items-center w-screen h-screen antialiased", notoSansSC.className, googleSansCode.variable)}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem>
           {children}
           <Footer />
-        </main>
+          <ThemeToggle />
+        </ThemeProvider>
       </body>
     </html>
   );
