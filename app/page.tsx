@@ -14,6 +14,7 @@ import {
   getDownloadUrl,
   type ReleasesResponse,
 } from "@/lib/api";
+import { compare } from "semver";
 
 type Platform = keyof typeof supportedVersionList;
 
@@ -38,6 +39,7 @@ export default function Home() {
 
   const latestStableVersion = releases ? getLatestStableVersion(releases) : null;
   const latestPreviewVersion = releases ? getLatestPreviewVersion(releases) : null;
+  const shouldShowPreview = latestPreviewVersion && compare(latestPreviewVersion, latestStableVersion ?? "0.0.0") > 0;
 
   const stableAsset = releases && platform && minVersion && latestStableVersion
     ? findAsset(releases, latestStableVersion, platform, minVersion)
@@ -116,7 +118,7 @@ export default function Home() {
                   link={getDownloadUrl(stableAsset.id)}
                   digest={stableAsset.digest}/>
               )}
-              {previewAsset && latestPreviewVersion && (
+              {previewAsset && latestPreviewVersion && shouldShowPreview && (
                 <DownloadButton
                   version={latestPreviewVersion}
                   label="预览版"
