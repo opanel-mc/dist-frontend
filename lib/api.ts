@@ -53,6 +53,17 @@ export function findAsset(
   return release.assets.find(a => a.server === server && a.gameVersion === gameVersion) ?? null;
 }
 
+export function getAssetListByGameVersion(releases: ReleasesResponse, server: string, gameVersion: string): ReleaseAsset[] {
+  const assets: ReleaseAsset[] = [];
+  for(const release of Object.values(releases)) {
+    const asset = release.assets.find(a => a.server === server && a.gameVersion === gameVersion);
+    if(asset) {
+      assets.push(asset);
+    }
+  }
+  return assets;
+}
+
 export function getDownloadUrl(assetId: number): string {
   return `${BASE_URL}/api/download/${assetId}`;
 }
