@@ -18,8 +18,9 @@ import { compare } from "semver";
 import { ReleasesContext } from "@/contexts/releases";
 import { HistoryVersionsDialog } from "./history-versions-dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, HandCoins } from "lucide-react";
 import { getMinVersionForMcVersion, Platform } from "@/lib/utils";
+import Link from "next/link";
 
 export default function Home() {
   const [platform, setPlatform] = useState<Platform | null>(null);
@@ -122,12 +123,20 @@ export default function Home() {
                 {!stableAsset && !previewAsset && (
                   <p className="text-center text-sm text-muted-foreground">此平台暂无可用下载</p>
                 )}
-                <HistoryVersionsDialog>
-                  <Button variant="link" size="sm">
-                    历史版本
-                    <ArrowRight />
+                <div className="flex justify-center gap-2">
+                  <Button variant="link" size="sm" asChild>
+                    <Link href="https://nocp.space/donate" target="_blank" className="text-opanel! no-underline hover:decoration-[0.5px]!">
+                      <HandCoins />
+                      支持作者
+                    </Link>
                   </Button>
-                </HistoryVersionsDialog>
+                  <HistoryVersionsDialog>
+                    <Button variant="link" size="sm" className="text-opanel">
+                      历史版本
+                      <ArrowRight />
+                    </Button>
+                  </HistoryVersionsDialog>
+                </div>
               </>
             )}
           </div>
