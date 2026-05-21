@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+import Script from "next/script";
 import { Footer } from "./footer";
 import LogoIcon from "@/assets/logo.png";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { googleSansCode, notoSansSC } from "@/lib/fonts";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+const baiduAnalyticsScript = `
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?2255a6caae3ec9601a1509d6cbb4aa52";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+`;
 
 export const metadata: Metadata = {
   title: "OPanel 资源库",
@@ -20,6 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-cn" suppressHydrationWarning>
+      <head>
+        <Script>{baiduAnalyticsScript}</Script>
+      </head>
       <body className={cn("flex flex-col justify-center items-center w-screen h-screen antialiased", notoSansSC.className, googleSansCode.variable)}>
         <ThemeProvider
           attribute="class"
