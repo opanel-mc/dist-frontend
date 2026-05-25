@@ -85,13 +85,15 @@ export default function Home() {
                 <SelectValue placeholder="请选择Minecraft版本..."/>
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(selectedPlatformData ?? {}).flatMap(([, versions]) =>
-                  versions.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {v}
-                    </SelectItem>
-                  ))
-                )}
+                {Object.entries(selectedPlatformData ?? {}).flatMap(([, versions]) => (
+                  [...versions]
+                    .reverse()
+                    .map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {v}
+                      </SelectItem>
+                    ))
+                ))}
               </SelectContent>
             </Select>
           )}
