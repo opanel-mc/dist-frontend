@@ -71,7 +71,7 @@ export default function Home() {
               <SelectValue placeholder="请选择服务端平台..."/>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="bukkit">Bukkit / Spigot / Paper / Leaves</SelectItem>
+              <SelectItem value="bukkit">Paper / Leaves</SelectItem>
               <SelectItem value="folia">Folia</SelectItem>
               <SelectItem value="fabric">Fabric</SelectItem>
               <SelectItem value="forge">Forge</SelectItem>
