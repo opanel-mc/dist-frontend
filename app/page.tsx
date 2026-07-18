@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import LogoIcon from "@/assets/logo.png";
 import { DownloadButton } from "@/components/download-button";
 import { Spinner } from "@/components/ui/spinner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import supportedVersionList from "@/data/supported-version-list.json";
 import {
   fetchReleases,
@@ -14,12 +14,12 @@ import {
   getDownloadUrl,
   type ReleasesResponse,
 } from "@/lib/api";
-import { compare } from "semver";
 import { ReleasesContext } from "@/contexts/releases";
 import { HistoryVersionsDialog } from "./history-versions-dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, HandCoins } from "lucide-react";
 import { getMinVersionForMcVersion, Platform } from "@/lib/utils";
+import { compareVersions } from "@/lib/version";
 import Link from "next/link";
 
 export default function Home() {
@@ -33,7 +33,7 @@ export default function Home() {
 
   const latestStableVersion = releases ? getLatestStableVersion(releases) : null;
   const latestPreviewVersion = releases ? getLatestPreviewVersion(releases) : null;
-  const shouldShowPreview = latestPreviewVersion && compare(latestPreviewVersion, latestStableVersion ?? "0.0.0") > 0;
+  const shouldShowPreview = latestPreviewVersion && compareVersions(latestPreviewVersion, latestStableVersion ?? "0.0.0") > 0;
 
   const stableAsset = releases && platform && minVersion && latestStableVersion
     ? findAsset(releases, latestStableVersion, platform, minVersion)
@@ -71,11 +71,13 @@ export default function Home() {
               <SelectValue placeholder="请选择服务端平台..."/>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="bukkit">Paper / Leaves</SelectItem>
-              <SelectItem value="folia">Folia</SelectItem>
-              <SelectItem value="fabric">Fabric</SelectItem>
-              <SelectItem value="forge">Forge</SelectItem>
-              <SelectItem value="neoforge">NeoForge</SelectItem>
+              <SelectGroup>
+                <SelectItem value="paper">Paper / Leaves</SelectItem>
+                <SelectItem value="folia">Folia</SelectItem>
+                <SelectItem value="fabric">Fabric</SelectItem>
+                <SelectItem value="forge">Forge</SelectItem>
+                <SelectItem value="neoforge">NeoForge</SelectItem>
+              </SelectGroup>
             </SelectContent>
           </Select>
 
@@ -85,15 +87,17 @@ export default function Home() {
                 <SelectValue placeholder="请选择Minecraft版本..."/>
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(selectedPlatformData ?? {}).flatMap(([, versions]) => (
-                  [...versions]
-                    .reverse()
-                    .map((v) => (
-                      <SelectItem key={v} value={v}>
-                        {v}
-                      </SelectItem>
-                    ))
-                ))}
+                <SelectGroup>
+                  {Object.entries(selectedPlatformData ?? {}).flatMap(([, versions]) => (
+                    [...versions]
+                      .reverse()
+                      .map((v) => (
+                        <SelectItem key={v} value={v}>
+                          {v}
+                        </SelectItem>
+                      ))
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           )}

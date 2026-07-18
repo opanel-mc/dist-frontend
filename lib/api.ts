@@ -1,7 +1,9 @@
 import axios from "axios";
 import { isPreviewVersion } from "./utils";
+import { isVersionAtLeast } from "./version";
 
 const BASE_URL = process.env["NEXT_PUBLIC_SERVICE_BASE_URL"] ?? "";
+const PAPER_MIGRATION_VERSION = "2.2.0-pre1";
 
 export interface ReleaseAsset {
   id: number;
@@ -22,6 +24,11 @@ export interface Release {
 }
 
 export type ReleasesResponse = Record<string, Release>;
+
+export function getAssetServer(platform: string, opanelVersion: string): string {
+  if(platform !== "paper") return platform;
+  return isVersionAtLeast(opanelVersion, PAPER_MIGRATION_VERSION) ? "paper" : "bukkit";
+}
 
 export async function fetchReleases(): Promise<ReleasesResponse> {
   const res = await axios.get<ReleasesResponse>(`${BASE_URL}/api/releases`);
@@ -45,17 +52,19 @@ export function getLatestPreviewVersion(releases: ReleasesResponse): string | nu
 export function findAsset(
   releases: ReleasesResponse,
   opanelVersion: string,
-  server: string,
+  platform: string,
   gameVersion: string
 ): ReleaseAsset | null {
   const release = releases[opanelVersion];
   if (!release) return null;
+  const server = getAssetServer(platform, opanelVersion);
   return release.assets.find(a => a.server === server && a.gameVersion === gameVersion) ?? null;
 }
 
-export function getAssetListByGameVersion(releases: ReleasesResponse, server: string, gameVersion: string): ReleaseAsset[] {
+export function getAssetListByGameVersion(releases: ReleasesResponse, platform: string, gameVersion: string): ReleaseAsset[] {
   const assets: ReleaseAsset[] = [];
-  for(const release of Object.values(releases)) {
+  for(const [opanelVersion, release] of Object.entries(releases)) {
+    const server = getAssetServer(platform, opanelVersion);
     const asset = release.assets.find(a => a.server === server && a.gameVersion === gameVersion);
     if(asset) {
       assets.push(asset);

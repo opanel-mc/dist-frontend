@@ -41,10 +41,14 @@ OPanel download files follow the format:
 opanel-<服务端>-<最低支持版本>-build-<OPanel版本>.jar
 ```
 
-Example: `opanel-bukkit-1.21.9-build-1.2.1.jar`
+Example: `opanel-paper-1.21.9-build-2.2.0-pre1.jar`
+
+Paper platform assets use `bukkit` in filenames before OPanel `2.2.0-pre1`, and
+`paper` starting from `2.2.0-pre1`. The frontend platform identifier is `paper`;
+the API asset lookup in `lib/api.ts` handles the historical filename mapping.
 
 In `data/supported-version-list.json`:
-- **Key** = platform identifier (bukkit, fabric, forge, neoforge, folia)
+- **Key** = platform identifier (paper, fabric, forge, neoforge, folia)
 - **Sub-key** = "最低支持版本" (minimum supported MC version) used in the filename
 - **Value** = array of all MC versions that file supports
 
@@ -56,3 +60,6 @@ When a user selects a platform and MC version in the Select components, the app 
 - Tailwind 4 uses `@import "tailwindcss"` with `@theme inline` for CSS variable definitions
 - Components use `cn()` from `lib/utils.ts` for conditional class merging
 - Version checking: `isPreviewVersion()` returns true for versions containing "pre" or "rc"
+- Semver comparisons use `lib/version.ts`, which normalizes legacy preview versions such as
+  `1.0.0rc8` and `1.0.0pre1` by inserting the missing hyphen, without changing the version
+  shown to users or used as an API key.
