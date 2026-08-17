@@ -1,13 +1,13 @@
-import { useContext, useState, type PropsWithChildren } from "react";
+import { useContext, type PropsWithChildren } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ReleasesContext } from "@/contexts/releases";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { getAssetListByGameVersion, getDownloadUrl, ReleaseAsset } from "@/lib/api";
-import { cn, copyToClipboard, formatDataSize, getMinVersionForMcVersion, isPreviewVersion } from "@/lib/utils";
+import { cn, formatDataSize, getMinVersionForMcVersion, isPreviewVersion } from "@/lib/utils";
 import { googleSansCode } from "@/lib/fonts";
 import { Button } from "@/components/ui/button";
-import { Check, Download, FileDigit } from "lucide-react";
+import { Download } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
@@ -37,41 +37,18 @@ const columns: ColumnDef<ReleaseAsset>[] = [
   {
     id: "controls",
     header: "",
-    cell: ({ row }) => {
-      const digest = row.original.digest;
-      const [copied, setCopied] = useState(false);
-      
-      const handleCopy = async () => {
-        await copyToClipboard(digest!);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      };
-
-      return (
-        <div className="flex justify-end">
-          {digest && (
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={() => handleCopy()}>
-              {
-                copied
-                ? <Check />
-                : <FileDigit />
-              }
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            asChild>
-            <Link href={getDownloadUrl(row.original.id)} target="_blank">
-              <Download />
-            </Link>
-          </Button>
-        </div>
-      );
-    }
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          asChild>
+          <Link href={getDownloadUrl(row.original.opanelVersion, row.original.name)} target="_blank">
+            <Download />
+          </Link>
+        </Button>
+      </div>
+    )
   }
 ];
 

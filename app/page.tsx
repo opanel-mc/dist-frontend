@@ -116,15 +116,13 @@ export default function Home() {
                     version={latestStableVersion}
                     label="稳定版"
                     isStable
-                    link={getDownloadUrl(stableAsset.id)}
-                    digest={stableAsset.digest}/>
+                    link={getDownloadUrl(stableAsset.opanelVersion, stableAsset.name)}/>
                 )}
                 {previewAsset && latestPreviewVersion && shouldShowPreview && (
                   <DownloadButton
                     version={latestPreviewVersion}
                     label="预览版"
-                    link={getDownloadUrl(previewAsset.id)}
-                    digest={previewAsset.digest}/>
+                    link={getDownloadUrl(previewAsset.opanelVersion, previewAsset.name)}/>
                 )}
                 {!stableAsset && !previewAsset && (
                   <p className="text-center text-sm text-muted-foreground">此平台暂无可用下载</p>
