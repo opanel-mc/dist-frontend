@@ -18,9 +18,10 @@ import { ReleasesContext } from "@/contexts/releases";
 import { HistoryVersionsDialog } from "./history-versions-dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, HandCoins } from "lucide-react";
-import { getMinVersionForMcVersion, Platform } from "@/lib/utils";
+import { cn, getMinVersionForMcVersion, Platform } from "@/lib/utils";
 import { compareVersions } from "@/lib/version";
 import Link from "next/link";
+import { googleSansCode } from "@/lib/fonts";
 
 export default function Home() {
   const [platform, setPlatform] = useState<Platform | null>(null);
@@ -140,6 +141,14 @@ export default function Home() {
                       <ArrowRight />
                     </Button>
                   </HistoryVersionsDialog>
+                </div>
+                <div className="mx-auto flex items-center gap-2">
+                  <span className={cn("text-center text-xs", googleSansCode.className)}>
+                    记得为 <Link href="https://github.com/opanel-mc/opanel" target="_blank">OPanel</Link> 点个star！
+                  </span>
+                  <Link href="https://github.com/opanel-mc/opanel" target="_blank">
+                    <img src="https://img.shields.io/github/stars/opanel-mc/opanel.svg?label=Stars"/>
+                  </Link>
                 </div>
               </>
             )}
