@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import supportedVersionList from "@/data/supported-version-list.json";
+import { PUMPKIN_TARGET_LABELS } from "./global";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -19,6 +20,10 @@ export function isPreviewVersion(version: string) {
 }
 
 export type Platform = keyof typeof supportedVersionList;
+
+export function formatPumpkinTarget(target: string): string {
+  return PUMPKIN_TARGET_LABELS[target] ?? target;
+}
 
 export function getMinVersionForMcVersion(platform: Platform, mcVersion: string): string | null {
   const platformData = supportedVersionList[platform];

@@ -1,6 +1,7 @@
 import { googleSansCode } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { COPYRIGHT_YEAR } from "@/lib/global";
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
         Designed & Maintained by <Link href="https://github.com/NriotHrreion" target="_blank">Norcleeh</Link>
       </span>
       <span>
-        Copyright (c) 2026 <Link href="https://opanel.cn" target="_blank">OPanel Project</Link>
+        Copyright (c) {COPYRIGHT_YEAR} <Link href="https://opanel.cn" target="_blank">OPanel Project</Link>
       </span>
     </footer>
   );

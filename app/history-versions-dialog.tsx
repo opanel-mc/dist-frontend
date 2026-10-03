@@ -3,8 +3,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ReleasesContext } from "@/contexts/releases";
 import { DataTable } from "@/components/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { getAssetListByGameVersion, getDownloadUrl, ReleaseAsset } from "@/lib/api";
-import { cn, formatDataSize, getMinVersionForMcVersion, isPreviewVersion } from "@/lib/utils";
+import { getAssetList, getDownloadUrl, ReleaseAsset } from "@/lib/api";
+import { cn, formatDataSize, formatPumpkinTarget, getMinVersionForMcVersion, isPreviewVersion } from "@/lib/utils";
 import { googleSansCode } from "@/lib/fonts";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
@@ -53,10 +53,11 @@ const columns: ColumnDef<ReleaseAsset>[] = [
 ];
 
 export function HistoryVersionsDialog({ children }: PropsWithChildren) {
-  const { releases, platform, mcVersion } = useContext(ReleasesContext);
-  const minVersion = platform && mcVersion ? getMinVersionForMcVersion(platform, mcVersion) : null;
+  const { releases, platform, mcVersion, target } = useContext(ReleasesContext);
+  const minVersion = platform && platform !== "pumpkin" && mcVersion ? getMinVersionForMcVersion(platform, mcVersion) : null;
+  const versionOrTarget = platform === "pumpkin" ? target : minVersion;
 
-  if(!releases || !platform || !mcVersion) return <></>;
+  if(!releases || !platform || !versionOrTarget) return <></>;
 
   return (
     <Dialog>
@@ -65,17 +66,13 @@ export function HistoryVersionsDialog({ children }: PropsWithChildren) {
         <DialogHeader>
           <DialogTitle>历史版本</DialogTitle>
           <DialogDescription>
-            {`${platform} ${mcVersion}`}
+            {`${platform} ${platform === "pumpkin" ? formatPumpkinTarget(versionOrTarget) : mcVersion}`}
           </DialogDescription>
         </DialogHeader>
         <div className="max-h-96 overflow-y-auto pr-2">
           <DataTable
             columns={columns}
-            data={
-              minVersion
-              ? getAssetListByGameVersion(releases, platform, minVersion)
-              : []
-            }/>
+            data={getAssetList(releases, platform, versionOrTarget)}/>
         </div>
       </DialogContent>
     </Dialog>
