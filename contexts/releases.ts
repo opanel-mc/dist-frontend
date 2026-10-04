@@ -6,6 +6,7 @@ interface ReleasesContextType {
   releases: ReleasesResponse | null;
   platform: Platform | null;
   mcVersion: string | null;
+  target: string | null;
 }
 
 export const ReleasesContext = createContext<ReleasesContextType>(undefined!);

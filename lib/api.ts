@@ -1,15 +1,15 @@
 import axios from "axios";
 import { isPreviewVersion } from "./utils";
 import { compareVersions, isVersionAtLeast } from "./version";
-
-const BASE_URL = process.env["NEXT_PUBLIC_SERVICE_BASE_URL"] ?? "";
-const PAPER_MIGRATION_VERSION = "2.2.0-pre1";
+import { PAPER_MIGRATION_VERSION, SERVICE_BASE_URL } from "./global";
 
 export interface ReleaseAsset {
-  name: string; // 文件名（包含.jar）
+  name: string; // 完整文件名（包含扩展名）
   server: string; // 服务端平台
-  gameVersion: string;
+  gameVersion: string | null; // Pumpkin 为 null
   opanelVersion: string;
+  target: string | null; // Java 平台为 null
+  format: "jar" | "dll" | "so" | "dylib";
   size: number;
 }
 
@@ -21,7 +21,7 @@ export function getAssetServer(platform: string, opanelVersion: string): string 
 }
 
 export async function fetchReleases(): Promise<ReleasesResponse> {
-  const res = await axios.get<ReleasesResponse>(`${BASE_URL}/releases`);
+  const res = await axios.get<ReleasesResponse>(`${SERVICE_BASE_URL}/releases`);
   return res.data;
 }
 
@@ -39,23 +39,38 @@ export function getLatestPreviewVersion(releases: ReleasesResponse): string | nu
   return sorted[0] ?? null;
 }
 
+export function getPumpkinTargets(releases: ReleasesResponse): string[] {
+  const targets = new Set<string>();
+  for(const release of Object.values(releases)) {
+    for(const asset of release) {
+      if(asset.server === "pumpkin" && asset.target) {
+        targets.add(asset.target);
+      }
+    }
+  }
+  return [...targets].sort();
+}
+
 export function findAsset(
   releases: ReleasesResponse,
   opanelVersion: string,
   platform: string,
-  gameVersion: string
+  versionOrTarget: string
 ): ReleaseAsset | null {
   const release = releases[opanelVersion];
   if (!release) return null;
   const server = getAssetServer(platform, opanelVersion);
-  return release.find(a => a.server === server && a.gameVersion === gameVersion) ?? null;
+  return release.find(a => a.server === server && (
+    platform === "pumpkin"
+      ? a.target === versionOrTarget
+      : a.gameVersion === versionOrTarget
+  )) ?? null;
 }
 
-export function getAssetListByGameVersion(releases: ReleasesResponse, platform: string, gameVersion: string): ReleaseAsset[] {
+export function getAssetList(releases: ReleasesResponse, platform: string, versionOrTarget: string): ReleaseAsset[] {
   const assets: ReleaseAsset[] = [];
-  for(const [opanelVersion, release] of Object.entries(releases)) {
-    const server = getAssetServer(platform, opanelVersion);
-    const asset = release.find(a => a.server === server && a.gameVersion === gameVersion);
+  for(const opanelVersion of Object.keys(releases)) {
+    const asset = findAsset(releases, opanelVersion, platform, versionOrTarget);
     if(asset) {
       assets.push(asset);
     }
@@ -64,5 +79,5 @@ export function getAssetListByGameVersion(releases: ReleasesResponse, platform: 
 }
 
 export function getDownloadUrl(opanelVersion: string, fileName: string): string {
-  return `${BASE_URL}/download/${encodeURIComponent(opanelVersion)}/${encodeURIComponent(fileName)}`;
+  return `${SERVICE_BASE_URL}/download/${encodeURIComponent(opanelVersion)}/${encodeURIComponent(fileName)}`;
 }

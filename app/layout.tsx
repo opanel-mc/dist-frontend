@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="zh-cn" suppressHydrationWarning>
       <head>
-        <Script>{baiduAnalyticsScript}</Script>
+        <Script id="baidu-analytics">{baiduAnalyticsScript}</Script>
       </head>
       <body className={cn("flex flex-col justify-center items-center w-screen h-screen antialiased", notoSansSC.className, googleSansCode.variable)}>
         <ThemeProvider
