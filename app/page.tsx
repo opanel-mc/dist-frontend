@@ -28,6 +28,7 @@ export default function Home() {
   const [mcVersion, setMcVersion] = useState<string | null>(null);
   const [releases, setReleases] = useState<ReleasesResponse | null>(null);
   const [releasesLoading, setReleasesLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const selectedPlatformData = platform ? supportedVersionList[platform] : null;
   const minVersion = platform && mcVersion ? getMinVersionForMcVersion(platform, mcVersion) : null;
@@ -52,7 +53,7 @@ export default function Home() {
     setReleasesLoading(true);
     fetchReleases()
       .then(setReleases)
-      .catch(console.error)
+      .catch(() => setErrorMessage("下载站服务维护中，暂时不可用"))
       .finally(() => setReleasesLoading(false));
   }, []);
 
@@ -65,6 +66,10 @@ export default function Home() {
           className="w-32 drop-shadow-2xl"
           style={{ imageRendering: "pixelated" }}/>
         <h1 className="text-xl font-semibold">OPanel 资源库</h1>
+
+        {errorMessage && (
+          <span className="text-sm text-destructive">{errorMessage}</span>
+        )}
 
         <div className="w-72 mt-4 flex flex-col gap-2 *:w-full">
           <Select value={platform ?? undefined} onValueChange={handlePlatformChange}>
